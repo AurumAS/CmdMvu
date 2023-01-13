@@ -5,13 +5,14 @@ open FSharp.Data
 [<Literal>]
 let private searchSample =
     "https://data.brreg.no/enhetsregisteret/api/enheter?navn=Sesam&fraRegistreringsdatoEnhetsregisteret=2010-10-20&tilRegistreringsdatoEnhetsregisteret=2023-01-09&konkurs=false"
+
 let private searchUrl =
     "https://data.brreg.no/enhetsregisteret/api/enheter?forretningsadresse.landkode=NO&fraRegistreringsdatoEnhetsregisteret=2014-10-20&tilRegistreringsdatoEnhetsregisteret=2023-01-09&konkurs=false&navn="
 
-type private BregSearch = JsonProvider<searchSample>
+type private BrregSearch = JsonProvider<searchSample>
 
 let search searchTerm =
-    let result = BregSearch.Load(searchUrl + searchTerm)
+    let result = BrregSearch.Load(searchUrl + searchTerm)
 
     match result.Page.TotalElements with
     | 0 -> Array.empty
@@ -32,12 +33,13 @@ options.WriteIndented <- true
 [<Literal>]
 let private enhetSample =
     "https://data.brreg.no/enhetsregisteret/api/enheter/914159350"
+
 let private enhetsUrl = "https://data.brreg.no/enhetsregisteret/api/enheter/"
 
-type private BregEnhet = JsonProvider<enhetSample>
+type private BrregEnhet = JsonProvider<enhetSample>
 
 let companyDetails orgnr =
-    let result = BregEnhet.Load(enhetsUrl + orgnr)
+    let result = BrregEnhet.Load(enhetsUrl + orgnr)
 
     let adresse =
         {| Adresse = result.Forretningsadresse.Adresse

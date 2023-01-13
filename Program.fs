@@ -3,6 +3,7 @@
 open Spectre.Console.FSharp
 
 type OrgNr = OrgNr of string
+
 module OrgNr =
     let value (OrgNr value) = value
 
@@ -31,9 +32,7 @@ type Message =
 let view model =
     match model with
     | StartScreen ->
-        let selectionOptions =
-            [ "Search for company"; "Exit" ]
-            |> List.map Choice
+        let selectionOptions = [ "Search for company"; "Exit" ] |> List.map Choice
 
         console {
             figlet {
@@ -75,15 +74,12 @@ let view model =
             error { description $"No company found for search term {searchTerm}" }
             return ShowSearch
         }
-    | SearchCompanyResult searchresults ->
+    | SearchCompanyResult searchResults ->
         let selectionOptions =
-            (searchresults.SearchResult
-             |> Seq.map (fun result ->
-                 $"{result.OrgNr |> OrgNr.value} {result.Name}"
-                 |> Choice)
+            (searchResults.SearchResult
+             |> Seq.map (fun result -> $"{result.OrgNr |> OrgNr.value} {result.Name}" |> Choice)
              |> Seq.toList)
-            @ [ "New search" |> Choice
-                "Exit" |> Choice ]
+            @ [ "New search" |> Choice; "Exit" |> Choice ]
 
         console {
             let choice =
@@ -97,16 +93,14 @@ let view model =
                 | Choice "New search" -> ShowSearch
                 | Choice "Exit" -> ExitScreen
                 | Choice companyname ->
-                    let orgnr = companyname.[0..9]
+                    let orgnr = companyname[0..9]
                     orgnr |> OrgNr |> Message.ShowCompanyDetails
         }
-    | CompanyDetails (searchResult, jsonstring) ->
-        let selectionOptions =
-            [ "Back"; "New Search"; "Exit" ]
-            |> List.map Choice
+    | CompanyDetails(_, jsonString) ->
+        let selectionOptions = [ "Back"; "New Search"; "Exit" ] |> List.map Choice
 
         console {
-            jsonview { json jsonstring }
+            jsonView { json jsonString }
 
             let choice =
                 selection {
@@ -152,29 +146,27 @@ let update model message =
             |> Some
     | BackToSearchResult ->
         match model with
-        | CompanyDetails (searchResult, _) -> searchResult |> Model.SearchCompanyResult |> Some
+        | CompanyDetails(searchResult, _) -> searchResult |> Model.SearchCompanyResult |> Some
         | _ -> failwith "Invalid state transition"
-    | ShowCompanyDetails (OrgNr orgnr) ->
+    | ShowCompanyDetails(OrgNr orgnr) ->
         match model with
         | SearchCompanyResult searchResult ->
             let companyDetails = orgnr |> Brreg.companyDetails
 
-            (searchResult, companyDetails)
-            |> CompanyDetails
-            |> Some
+            (searchResult, companyDetails) |> CompanyDetails |> Some
         | _ -> failwith "Invalid state transition"
     | ExitScreen -> Model.Exit |> Some
     | Exited -> None
 
 
 [<EntryPoint>]
-let main args =
+let main _ =
 
-    let rec mvuloop model =
+    let rec mvuLoop model =
         match model |> view |> update model with
-        | Some newModel -> newModel |> mvuloop
+        | Some newModel -> newModel |> mvuLoop
         | None -> ()
 
-    mvuloop StartScreen
+    mvuLoop StartScreen
     System.Console.ReadLine() |> ignore
     0

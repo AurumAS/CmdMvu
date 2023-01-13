@@ -9,6 +9,8 @@
     <Compile Include="Brreg.fs" />
     <Compile Include="SpectreFSharp.fs" />
     <Compile Include="Program.fs" />
+    <Content Include="Format.ps1" />
+    <Content Include="Check-Format.ps1" />
   </ItemGroup>
 
   <ItemGroup>
