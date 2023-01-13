@@ -65,10 +65,7 @@ type SelectionBuilder() =
         prompt.PageSize <- config.PageSize
         prompt.MoreChoicesText <- config.MoreChoicesText
 
-        prompt.AddChoices(
-            config.Choices
-            |> Seq.map (fun (Choice choice) -> choice)
-        )
+        prompt.AddChoices(config.Choices |> Seq.map (fun (Choice choice) -> choice))
         |> ignore
 
         prompt |> AnsiConsole.Prompt |> Choice
@@ -131,11 +128,7 @@ type JsonViewBuilder() =
         let panel = new Panel(jsonText)
         panel.Header <- new PanelHeader(config.Header)
 
-        panel
-            .RoundedBorder()
-            .Collapse()
-            .BorderColor(Color.Yellow)
-        |> AnsiConsole.Write
+        panel.RoundedBorder().Collapse().BorderColor(Color.Yellow) |> AnsiConsole.Write
 
         ()
 
