@@ -4,13 +4,13 @@ open Spectre.Console
 open Spectre.Console.Json
 open Spectre.Console.Rendering
 
-type Alignement =
+type Alignment =
     | Left
     | Center
     | Right
 
 type FigletConfig =
-    { Aligned: Alignement
+    { Aligned: Alignment
       Color: Spectre.Console.Color
       Text: string }
 
@@ -22,7 +22,7 @@ type FigletBuilder() =
 
     member _.Run(config) =
 
-        let text = new FigletText(config.Text)
+        let text = FigletText(config.Text)
 
         match config.Aligned with
         | Left -> text.Justification <- Justify.Left
@@ -40,7 +40,7 @@ type FigletBuilder() =
     member _.Color(state, color) = { state with Color = color }
 
     [<CustomOperation "aligned">]
-    member _.Aligned(state, alignement) = { state with Aligned = alignement }
+    member _.Aligned(state, alignment) = { state with Aligned = alignment }
 
 
 type Choice = Choice of string
@@ -53,7 +53,7 @@ type SelectionConfig =
 
 
 type SelectionBuilder() =
-    member _.Yield(_) =
+    member _.Yield _ =
         { Title = ""
           PageSize = 5
           MoreChoicesText = "More"
@@ -73,9 +73,9 @@ type SelectionBuilder() =
     [<CustomOperation("title")>]
     member _.Title(state, title) = { state with Title = title }
 
-    [<CustomOperation("morceChoicesText")>]
-    member _.MorceChoices(state, morechoicestext) =
-        { state with MoreChoicesText = morechoicestext }
+    [<CustomOperation("moreChoicesText")>]
+    member _.MoreChoices(state, moreChoicesText) =
+        { state with MoreChoicesText = moreChoicesText }
 
     [<CustomOperation("pageSize")>]
     member _.PageSize(state, pageSize) = { state with PageSize = pageSize }
@@ -88,10 +88,10 @@ type TextPromptConfig =
       Validation: (string -> ValidationResult) option }
 
 type TextPromptBuilder() =
-    member _.Yield(_) = { Question = ""; Validation = None }
+    member _.Yield _ = { Question = ""; Validation = None }
 
     member _.Run(config) =
-        let prompt = new TextPrompt<string>(config.Question)
+        let prompt = TextPrompt<string>(config.Question)
 
         match config.Validation with
         | None -> ()
@@ -108,10 +108,10 @@ type TextPromptBuilder() =
 type ErrorConfig = { Description: string }
 
 type ErrorBuilder() =
-    member _.Yield(_) = { Description = "" }
+    member _.Yield _ = { Description = "" }
 
     member _.Run(config) =
-        AnsiConsole.Write(new Markup($"[red]{config.Description}[/]") :> Renderable)
+        AnsiConsole.Write(Markup($"[red]{config.Description}[/]") :> Renderable)
         AnsiConsole.WriteLine()
         ()
 
@@ -121,12 +121,12 @@ type ErrorBuilder() =
 type JsonViewConfig = { Json: string; Header: string }
 
 type JsonViewBuilder() =
-    member _.Yield(_) = { Json = ""; Header = "" }
+    member _.Yield _ = { Json = ""; Header = "" }
 
     member _.Run(config: JsonViewConfig) =
-        let jsonText = new JsonText(config.Json)
-        let panel = new Panel(jsonText)
-        panel.Header <- new PanelHeader(config.Header)
+        let jsonText = JsonText(config.Json)
+        let panel = Panel(jsonText)
+        panel.Header <- PanelHeader(config.Header)
 
         panel.RoundedBorder().Collapse().BorderColor(Color.Yellow) |> AnsiConsole.Write
 
@@ -143,7 +143,7 @@ type AnsiConsole() =
     member _.Return(x) = x
 
 let error = ErrorBuilder()
-let jsonview = JsonViewBuilder()
+let jsonView = JsonViewBuilder()
 let textPrompt = TextPromptBuilder()
 let selection = SelectionBuilder()
 let figlet = FigletBuilder()
