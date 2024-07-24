@@ -75,7 +75,8 @@ type SelectionBuilder() =
 
     [<CustomOperation("moreChoicesText")>]
     member _.MoreChoices(state, moreChoicesText) =
-        { state with MoreChoicesText = moreChoicesText }
+        { state with
+            MoreChoicesText = moreChoicesText }
 
     [<CustomOperation("pageSize")>]
     member _.PageSize(state, pageSize) = { state with PageSize = pageSize }

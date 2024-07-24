@@ -1,3 +1,3 @@
 dotnet tool restore
-dotnet fantomas . --recurse --check
+dotnet fantomas . --check
 exit $LastExitCode
