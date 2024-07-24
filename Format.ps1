@@ -1,2 +1,2 @@
 dotnet tool restore
-dotnet fantomas . --recurse
+dotnet fantomas .
